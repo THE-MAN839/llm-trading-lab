@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture - LLM Trading Lab</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 { color: #00ff88; margin-bottom: 30px; }
+        h2 { color: #00ff88; margin: 40px 0 20px 0; }
+        h3 { color: #fff; margin: 30px 0 15px 0; }
+        p { margin-bottom: 15px; }
+        code {
+            background: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+        th { color: #00ff88; }
+        .nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .nav a { color: #888; }
+        .nav a:hover { color: #00ff88; }
+        a { color: #00ff88; }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h1>📐 Architecture</h1>
+    
+    <div class="nav">
+        <a href="index.html">Home</a>
+        <a href="blog.html">Blog</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="dashboard.html">Dashboard</a>
+    </div>
+
+    <h2>System Overview</h2>
+    
+    <pre><code>llm-trading-experiment/
+├── src/                    # Production code
+│   ├── strategy.py         # Production strategy (live trading uses this)
+│   ├── live_trade.py       # Alpaca paper trading execution
+│   ├── scheduler.py        # Auto-runs every 30min
+│   ├── web_dashboard.py    # Dashboard API server
+│   └── backtest.py         # Mock backtest for testing
+│
+├── agents/                 # Research agents (isolated workspaces)
+│   ├── agent1_strategy/    # Tests strategy types
+│   │   ├── strategy.py     # Their copy to modify
+│   │   ├── research.py     # Their backtest runner
+│   │   ├── RESEARCH.md     # Findings log
+│   │   └── logs/           # Experiment history
+│   ├── agent2_risk/        # Optimizes risk parameters
+│   └── agent3_universe/    # Tests watchlists
+│
+├── logs/                   # Shared logs
+│   ├── live_trades.jsonl   # All live trades
+│   └── experiment_history.jsonl  # Backtest results
+│
+├── orchestrator.py         # Status overview CLI
+└── README.md               # Project docs</code></pre>
+
+    <h2>How It Works</h2>
+
+    <h3>1. Live Paper Trading</h3>
+    <p>Production strategy runs on Alpaca's paper trading API:</p>
+    <ol>
+        <li><code>scheduler.py</code> runs every 30 minutes during market hours</li>
+        <li>Calls <code>live_trade.py</code> to execute strategy</li>
+        <li>Strategy reads from <code>src/strategy.py</code></li>
+        <li>Checks RSI signals, places trades via Alpaca API</li>
+        <li>Logs all trades to <code>logs/live_trades.jsonl</code></li>
+    </ol>
+
+    <h3>2. Research Agents</h3>
+    <p>Each agent runs experiments in isolation:</p>
+    <ol>
+        <li>Agent reads their <code>strategy.py</code></li>
+        <li>Agent hypothesizes improvement</li>
+        <li>Agent modifies parameters</li>
+        <li>Agent runs <code>python3 research.py</code></li>
+        <li>Results logged to <code>logs/research_history.jsonl</code></li>
+        <li>Repeat</li>
+    </ol>
+
+    <h3>3. Production Updates</h3>
+    <p>When agents find improvements:</p>
+    <ol>
+        <li>Human reviews agent findings</li>
+        <li>Best config copied to <code>src/strategy.py</code></li>
+        <li>Live trading picks up changes on next cycle</li>
+    </ol>
+
+    <h2>Agent Models</h2>
+
+    <h3>Current (Day 1)</h3>
+    <table>
+        <tr>
+            <th>Agent</th>
+            <th>Model</th>
+            <th>Status</th>
+        </tr>
+        <tr>
+            <td>Strategy Explorer</td>
+            <td>GLM-5 (via OpenClaw)</td>
+            <td>✅ Running</td>
+        </tr>
+        <tr>
+            <td>Risk Manager</td>
+            <td>GLM-5 (via OpenClaw)</td>
+            <td>✅ Running</td>
+        </tr>
+        <tr>
+            <td>Universe Explorer</td>
+            <td>GLM-5 (via OpenClaw)</td>
+            <td>✅ Running</td>
+        </tr>
+    </table>
+
+    <h3>Planned (Multi-Model Comparison)</h3>
+    <table>
+        <tr>
+            <th>Model</th>
+            <th>Agent Workspace</th>
+            <th>API Key Needed</th>
+        </tr>
+        <tr>
+            <td>GPT-4</td>
+            <td>agent1_strategy_gpt4/</td>
+            <td>OPENAI_API_KEY</td>
+        </tr>
+        <tr>
+            <td>Claude</td>
+            <td>agent1_strategy_claude/</td>
+            <td>ANTHROPIC_API_KEY</td>
+        </tr>
+        <tr>
+            <td>GLM-5</td>
+            <td>agent1_strategy_glm/</td>
+            <td>Already running</td>
+        </tr>
+    </table>
+
+    <h2>Backtest Engine</h2>
+
+    <h3>Current Implementation</h3>
+    <p>⚠️ Using <strong>mock market data</strong> (random walk simulation)</p>
+    <ul>
+        <li>Simulates price movement with Gaussian noise</li>
+        <li>Tests over 30 days</li>
+        <li>High variance (same config: Sharpe -3.3 to +8.0)</li>
+    </ul>
+
+    <h3>Needed: Real Market Data</h3>
+    <p>Should use Alpaca's historical data API:</p>
+    <pre><code># TODO: Replace mock with real data
+bars = alpaca.get_bars("NVDA", "1D", limit=30)
+prices = [b.c for b in bars]</code></pre>
+
+    <h2>Metrics Tracked</h2>
+
+    <table>
+        <tr>
+            <th>Metric</th>
+            <th>Description</th>
+            <th>Target</th>
+        </tr>
+        <tr>
+            <td>Sharpe Ratio</td>
+            <td>Risk-adjusted returns</td>
+            <td>> 1.0</td>
+        </tr>
+        <tr>
+            <td>Win Rate</td>
+            <td>% of profitable trades</td>
+            <td>> 50%</td>
+        </tr>
+        <tr>
+            <td>Max Drawdown</td>
+            <td>Largest peak-to-trough</td>
+            <td>< 5%</td>
+        </tr>
+        <tr>
+            <td>Returns</td>
+            <td>Total portfolio return</td>
+            <td>Positive</td>
+        </tr>
+    </table>
+
+    <h2>API Reference</h2>
+
+    <h3>Dashboard API</h3>
+    <pre><code>GET /api/status
+Returns: {
+  timestamp: string,
+  agents: [{name, experiments, best_sharpe, ...}],
+  live_trading: {portfolio, cash, positions, ...},
+  production: {strategy, watchlist, ...}
+}</code></pre>
+
+    <h3>Agent History</h3>
+    <pre><code>GET /api/agent/{agent_name}/history
+Returns: [{timestamp, params, results, notes}, ...]</code></pre>
+
+    <hr style="border: none; border-top: 1px solid #333; margin: 40px 0;">
+    
+    <footer style="color: #666; font-size: 14px; text-align: center;">
+        <p><a href="index.html">← Back to Home</a></p>
+    </footer>
+</body>
+</html>
