@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Trading Lab - Autonomous Research Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 36px;
+            color: #00ff88;
+            margin-bottom: 10px;
+        }
+        .tagline {
+            color: #888;
+            margin-bottom: 40px;
+        }
+        h2 {
+            color: #00ff88;
+            margin: 40px 0 20px 0;
+            font-size: 24px;
+        }
+        h3 {
+            color: #fff;
+            margin: 30px 0 15px 0;
+        }
+        p { margin-bottom: 15px; }
+        code {
+            background: #1a1a1a;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            font-size: 14px;
+        }
+        pre {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+        }
+        pre code {
+            padding: 0;
+            background: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            color: #00ff88;
+            font-weight: 600;
+        }
+        .metric {
+            color: #00ff88;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .warning {
+            background: #ff444420;
+            border-left: 4px solid #ff4444;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .success {
+            background: #00ff8820;
+            border-left: 4px solid #00ff88;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        a {
+            color: #00ff88;
+            text-decoration: none;
+        }
+        a:hover { text-decoration: underline; }
+        .post-date {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .nav {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .nav a {
+            color: #888;
+        }
+        .nav a:hover {
+            color: #00ff88;
+        }
+        ul { margin-left: 20px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 LLM Trading Lab</h1>
+    <p class="tagline">Autonomous agents discovering trading strategies</p>
+    
+    <div class="nav">
+        <a href="index.html">Blog</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="dashboard.html">Live Dashboard</a>
+    </div>
+
+    <h2>📊 Live Status</h2>
+    
+    <p>Our autonomous research system is running continuously. Current stats:</p>
+    
+    <table>
+        <tr>
+            <th>Agent</th>
+            <th>Experiments</th>
+            <th>Best Sharpe</th>
+            <th>Focus</th>
+        </tr>
+        <tr>
+            <td>Strategy Explorer</td>
+            <td id="agent1-exps">Loading...</td>
+            <td id="agent1-sharpe">-</td>
+            <td>RSI thresholds, strategy types</td>
+        </tr>
+        <tr>
+            <td>Risk Manager</td>
+            <td id="agent2-exps">-</td>
+            <td id="agent2-sharpe">-</td>
+            <td>Stop loss, position sizing</td>
+        </tr>
+        <tr>
+            <td>Universe Explorer</td>
+            <td id="agent3-exps">-</td>
+            <td id="agent3-sharpe">-</td>
+            <td>Watchlist optimization</td>
+        </tr>
+    </table>
+    
+    <p><strong>API Status:</strong> <span id="api-status">Connecting...</span></p>
+
+    <h2>📝 Research Posts</h2>
+    
+    <h3>Day 1: System Launch (2026-03-12)</h3>
+    <p class="post-date">March 12, 2026</p>
+    
+    <p>Launched the autonomous trading research system inspired by Karpathy's <a href="https://github.com/karpathy/autoresearch">autoresearch</a> project.</p>
+    
+    <h4>What We Built</h4>
+    <ul>
+        <li><strong>3 Research Agents</strong> — Each with isolated workspace, modifying their own strategy.py</li>
+        <li><strong>Mean Reversion Strategy</strong> — RSI-based entries/exits on high-vol tech stocks</li>
+        <li><strong>Paper Trading</strong> — Connected to Alpaca for live testing</li>
+        <li><strong>Continuous Research</strong> — Agents run experiments autonomously</li>
+    </ul>
+    
+    <h4>Initial Findings</h4>
+    
+    <div class="success">
+        <strong>Best Configuration Found:</strong>
+        <ul>
+            <li>Strategy: Mean Reversion</li>
+            <li>Watchlist: NVDA, TSLA, META</li>
+            <li>Max Positions: 2</li>
+            <li>Entry RSI: < 25</li>
+            <li>Exit RSI: > 75</li>
+            <li>Best Sharpe: <strong>8.025</strong></li>
+        </ul>
+    </div>
+    
+    <div class="warning">
+        <strong>⚠️ High Variance Detected</strong>
+        <p>Same parameters can produce Sharpe from -3.3 to +8.0. Need multi-run validation (run each config 10x, average results).</p>
+    </div>
+    
+    <h4>Agent Results Summary</h4>
+    
+    <table>
+        <tr>
+            <th>Agent</th>
+            <th>Experiments</th>
+            <th>Best Sharpe</th>
+            <th>Key Discovery</th>
+        </tr>
+        <tr>
+            <td>Strategy (Agent 1)</td>
+            <td>30</td>
+            <td>7.564</td>
+            <td>RSI 27/73 may beat 25/75</td>
+        </tr>
+        <tr>
+            <td>Risk (Agent 2)</td>
+            <td>22</td>
+            <td>6.943</td>
+            <td>5%/15% stops are sharply optimal</td>
+        </tr>
+        <tr>
+            <td>Universe (Agent 3)</td>
+            <td>19</td>
+            <td><strong>8.025</strong></td>
+            <td>2 positions beats 3</td>
+        </tr>
+    </table>
+    
+    <h4>Architecture</h4>
+    
+    <pre><code>agents/
+├── agent1_strategy/     # Tests different strategy types
+│   ├── strategy.py      # Their copy to modify
+│   ├── RESEARCH.md      # Findings log
+│   └── logs/            # Experiment history
+├── agent2_risk/         # Optimizes risk parameters
+└── agent3_universe/     # Tests watchlists
+
+src/
+├── strategy.py          # Production (live trading uses this)
+├── live_trade.py        # Alpaca paper trading
+└── scheduler.py         # Runs every 30min</code></pre>
+
+    <h4>What's Next</h4>
+    <ul>
+        <li>Run validation batches (10x per config)</li>
+        <li>Connect real market data (replace mock backtests)</li>
+        <li>Add GPT-4 and Claude agents for comparison</li>
+        <li>Deploy to run continuously (days/weeks)</li>
+    </ul>
+
+    <hr style="border: none; border-top: 1px solid #333; margin: 40px 0;">
+    
+    <h2>About This Project</h2>
+    
+    <p>This is an experiment in <strong>autonomous AI research</strong> — agents that continuously iterate on trading strategies without human intervention.</p>
+    
+    <p>Inspired by:</p>
+    <ul>
+        <li><a href="https://github.com/karpathy/autoresearch">Karpathy's autoresearch</a> — Self-improving ML training</li>
+        <li><a href="https://github.com/HKUDS/AI-Trader">AI-Trader</a> — LLM trading benchmarks</li>
+        <li><a href="https://arxiv.org/abs/2511.03628">LiveTradeBench</a> — Live LLM trading evaluation</li>
+    </ul>
+    
+    <p><strong>Goal:</strong> Can autonomous agents discover profitable trading strategies through systematic experimentation?</p>
+
+    <hr style="border: none; border-top: 1px solid #333; margin: 40px 0;">
+    
+    <footer style="color: #666; font-size: 14px; text-align: center;">
+        <p>LLM Trading Lab — Built by THE MAN 🦾</p>
+        <p><a href="https://github.com/THE-MAN839/llm-trading-lab">GitHub Repo</a></p>
+    </footer>
+    
+    <script>
+        // Fetch live stats from your server
+        const API_URL = 'http://54.252.152.15:5000';
+        
+        fetch(API_URL + '/api/status', {mode: 'cors'})
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('api-status').textContent = '✅ Connected';
+                document.getElementById('api-status').style.color = '#00ff88';
+                
+                data.agents.forEach((agent, i) => {
+                    const num = i + 1;
+                    document.getElementById('agent' + num + '-exps').textContent = agent.experiments;
+                    document.getElementById('agent' + num + '-sharpe').textContent = 
+                        agent.best_sharpe ? agent.best_sharpe.toFixed(3) : '-';
+                });
+            })
+            .catch(e => {
+                document.getElementById('api-status').textContent = '❌ Disconnected (CORS or server down)';
+                document.getElementById('api-status').style.color = '#ff4444';
+                console.error('API error:', e);
+            });
+    </script>
+</body>
+</html>
