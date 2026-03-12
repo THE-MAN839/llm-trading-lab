@@ -8,86 +8,297 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0a0a0a;
-            color: #e0e0e0;
-            line-height: 1.6;
-            max-width: 800px;
+            background: #fafafa;
+            color: #1a1a1a;
+            line-height: 1.5;
+            max-width: 680px;
             margin: 0 auto;
-            padding: 60px 20px;
-            text-align: center;
+            padding: 48px 24px;
         }
         h1 {
-            font-size: 48px;
-            color: #00ff88;
-            margin-bottom: 10px;
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
         .tagline {
-            color: #888;
-            font-size: 20px;
-            margin-bottom: 60px;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 48px;
         }
-        .links {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 400px;
-            margin: 0 auto;
+        nav {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e0e0e0;
         }
-        a {
-            display: block;
-            background: #1a1a1a;
-            color: #e0e0e0;
-            padding: 20px;
-            border-radius: 12px;
+        nav a {
+            color: #1a1a1a;
             text-decoration: none;
-            border: 1px solid #333;
-            transition: all 0.2s;
+            margin-right: 24px;
+            font-weight: 500;
         }
-        a:hover {
-            background: #2a2a2a;
-            border-color: #00ff88;
-            color: #00ff88;
+        nav a:hover { color: #0066cc; }
+        nav a.active { color: #0066cc; }
+        
+        .section {
+            margin-bottom: 48px;
         }
-        .link-title {
-            font-size: 20px;
+        h2 {
+            font-size: 24px;
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
+            letter-spacing: -0.3px;
         }
-        .link-desc {
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .stat-value.positive { color: #00875a; }
+        .stat-value.negative { color: #de350b; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        th {
+            background: #f5f5f5;
+            font-weight: 600;
+            font-size: 13px;
+            color: #666;
+        }
+        tr:last-child td { border-bottom: none; }
+        
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .badge-green { background: #e3fcef; color: #00875a; }
+        .badge-red { background: #ffebe6; color: #de350b; }
+        .badge-gray { background: #f4f5f7; color: #666; }
+        
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 16px;
+        }
+        
+        a { color: #0066cc; }
+        a:hover { text-decoration: underline; }
+        
+        code {
+            background: #f4f5f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
             font-size: 14px;
-            color: #888;
         }
+        pre {
+            background: #f4f5f7;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+        .status-dot.online { background: #00875a; }
+        .status-dot.offline { background: #de350b; }
+        
         footer {
-            margin-top: 60px;
+            margin-top: 64px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
             color: #666;
             font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <h1>🧪 LLM Trading Lab</h1>
+    <h1>LLM Trading Lab</h1>
     <p class="tagline">Autonomous agents discovering trading strategies</p>
     
-    <div class="links">
-        <a href="blog.html">
-            <div class="link-title">📝 Research Blog</div>
-            <div class="link-desc">Daily findings, experiment results, lessons learned</div>
-        </a>
-        
-        <a href="architecture.html">
-            <div class="link-title">📐 Architecture</div>
-            <div class="link-desc">System design, how agents work, API reference</div>
-        </a>
-        
-        <a href="dashboard.html">
-            <div class="link-title">📊 Live Dashboard</div>
-            <div class="link-desc">Real-time status of agents and trading</div>
-        </a>
+    <nav>
+        <a href="index.html" class="active">Home</a>
+        <a href="blog.html">Research</a>
+        <a href="architecture.html">Architecture</a>
+        <a href="dashboard.html">Dashboard</a>
+    </nav>
+
+    <div class="section">
+        <h2>Status</h2>
+        <p><span class="status-dot" id="status-dot"></span><span id="status-text">Connecting...</span></p>
     </div>
-    
+
+    <div class="section">
+        <h2>Live Trading</h2>
+        <div class="stat-grid">
+            <div class="stat">
+                <div class="stat-label">Portfolio</div>
+                <div class="stat-value" id="portfolio">—</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Market</div>
+                <div class="stat-value" id="market">—</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Trades</div>
+                <div class="stat-value" id="trades">—</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Research Agents</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Agent</th>
+                    <th>Experiments</th>
+                    <th>Best Sharpe</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Strategy Explorer</td>
+                    <td id="a1-exps">—</td>
+                    <td id="a1-sharpe">—</td>
+                    <td><span class="badge badge-gray" id="a1-status">Loading</span></td>
+                </tr>
+                <tr>
+                    <td>Risk Manager</td>
+                    <td id="a2-exps">—</td>
+                    <td id="a2-sharpe">—</td>
+                    <td><span class="badge badge-gray" id="a2-status">Loading</span></td>
+                </tr>
+                <tr>
+                    <td>Universe Explorer</td>
+                    <td id="a3-exps">—</td>
+                    <td id="a3-sharpe">—</td>
+                    <td><span class="badge badge-gray" id="a3-status">Loading</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section">
+        <h2>Strategy</h2>
+        <div class="card">
+            <table>
+                <tr><td style="width: 140px; color: #666;">Type</td><td id="strat-type">—</td></tr>
+                <tr><td style="color: #666;">Watchlist</td><td id="strat-watchlist">—</td></tr>
+                <tr><td style="color: #666;">Entry RSI</td><td id="strat-entry">—</td></tr>
+                <tr><td style="color: #666;">Exit RSI</td><td id="strat-exit">—</td></tr>
+                <tr><td style="color: #666;">Stop Loss</td><td id="strat-stop">—</td></tr>
+                <tr><td style="color: #666;">Take Profit</td><td id="strat-profit">—</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>About</h2>
+        <p>Autonomous AI research system inspired by <a href="https://github.com/karpathy/autoresearch">Karpathy's autoresearch</a>. Agents continuously experiment to discover profitable trading strategies.</p>
+        <p style="margin-top: 12px;"><a href="https://github.com/THE-MAN839/llm-trading-lab">View on GitHub →</a></p>
+    </div>
+
     <footer>
-        <p>Built by THE MAN 🦾</p>
-        <p style="margin-top: 10px;"><a href="https://github.com/THE-MAN839/llm-trading-lab" style="color: #666; background: none; padding: 0; border: none;">GitHub</a></p>
+        Built by THE MAN
     </footer>
+
+    <script>
+        const API = 'http://54.252.152.15:5000';
+        
+        async function load() {
+            try {
+                const res = await fetch(API + '/api/status', {mode: 'cors'});
+                const data = await res.json();
+                
+                document.getElementById('status-dot').className = 'status-dot online';
+                document.getElementById('status-text').textContent = 'Connected';
+                
+                // Live trading
+                const live = data.live_trading;
+                if (live.connected) {
+                    document.getElementById('portfolio').textContent = '$' + live.portfolio.toLocaleString();
+                    document.getElementById('market').textContent = live.market_open ? 'Open' : 'Closed';
+                    document.getElementById('market').className = live.market_open ? 'stat-value positive' : 'stat-value';
+                    document.getElementById('trades').textContent = live.total_trades;
+                }
+                
+                // Agents
+                data.agents.forEach((a, i) => {
+                    const n = i + 1;
+                    document.getElementById('a' + n + '-exps').textContent = a.experiments;
+                    document.getElementById('a' + n + '-sharpe').textContent = a.best_sharpe ? a.best_sharpe.toFixed(2) : '—';
+                    
+                    const last = new Date(a.last_run);
+                    const mins = (Date.now() - last) / 60000;
+                    const badge = document.getElementById('a' + n + '-status');
+                    if (mins < 10) {
+                        badge.textContent = 'Active';
+                        badge.className = 'badge badge-green';
+                    } else {
+                        badge.textContent = 'Idle';
+                        badge.className = 'badge badge-gray';
+                    }
+                });
+                
+                // Strategy
+                const s = data.production;
+                if (s.strategy) {
+                    document.getElementById('strat-type').textContent = s.strategy;
+                    document.getElementById('strat-watchlist').textContent = s.watchlist.join(', ');
+                    document.getElementById('strat-entry').textContent = '< ' + s.entry_rsi;
+                    document.getElementById('strat-exit').textContent = '> ' + s.exit_rsi;
+                    document.getElementById('strat-stop').textContent = (s.stop_loss * 100) + '%';
+                    document.getElementById('strat-profit').textContent = (s.take_profit * 100) + '%';
+                }
+                
+            } catch (e) {
+                document.getElementById('status-dot').className = 'status-dot offline';
+                document.getElementById('status-text').textContent = 'Disconnected — API at ' + API;
+            }
+        }
+        
+        load();
+        setInterval(load, 15000);
+    </script>
 </body>
 </html>
