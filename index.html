@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM Trading Experiment Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #333;
+        }
+        h1 { font-size: 28px; color: #00ff88; }
+        .timestamp { color: #888; font-size: 14px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #333;
+        }
+        .card h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #00ff88;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .metric:last-child { border-bottom: none; }
+        .metric-label { color: #888; }
+        .metric-value { font-weight: 600; color: #fff; }
+        .metric-value.positive { color: #00ff88; }
+        .metric-value.negative { color: #ff4444; }
+        .best-sharpe {
+            font-size: 36px;
+            color: #00ff88;
+            text-align: center;
+            padding: 20px 0;
+        }
+        .best-sharpe-label { font-size: 14px; color: #888; text-align: center; }
+        .agent-status {
+            float: right;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-active { background: #00ff8820; color: #00ff88; }
+        .status-idle { background: #333; color: #888; }
+        .experiment-list { max-height: 200px; overflow-y: auto; }
+        .experiment-item {
+            display: grid;
+            grid-template-columns: 80px 60px 60px 60px;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .market-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .market-open { background: #00ff8820; color: #00ff88; }
+        .market-closed { background: #ff444420; color: #ff4444; }
+        .watchlist { display: flex; gap: 8px; flex-wrap: wrap; }
+        .watchlist-item {
+            background: #2a2a2a;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .refresh-btn {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .refresh-btn:hover { background: #00cc6a; }
+        .error-banner {
+            background: #ff444420;
+            color: #ff4444;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .connection-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .connected { background: #00ff8820; color: #00ff88; }
+        .disconnected { background: #ff444420; color: #ff4444; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>📊 LLM Trading Experiment</h1>
+                <span class="timestamp" id="timestamp">Loading...</span>
+                <span class="connection-status disconnected" id="connection">Disconnected</span>
+            </div>
+            <button class="refresh-btn" onclick="refresh()">🔄 Refresh</button>
+        </header>
+        
+        <div class="error-banner" id="error-banner"></div>
+        
+        <!-- Production Strategy -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>🎯 Production Strategy</h2>
+            <div class="grid" style="margin: 0;">
+                <div>
+                    <div class="metric">
+                        <span class="metric-label">Strategy Type</span>
+                        <span class="metric-value" id="prod-strategy">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Max Positions</span>
+                        <span class="metric-value" id="prod-max-pos">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Entry RSI</span>
+                        <span class="metric-value" id="prod-entry-rsi">-</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric">
+                        <span class="metric-label">Exit RSI</span>
+                        <span class="metric-value" id="prod-exit-rsi">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Stop Loss</span>
+                        <span class="metric-value" id="prod-stop-loss">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Take Profit</span>
+                        <span class="metric-value" id="prod-take-profit">-</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric">
+                        <span class="metric-label">Watchlist</span>
+                    </div>
+                    <div class="watchlist" id="prod-watchlist">-</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Live Trading -->
+        <div class="card" style="margin-bottom: 20px;">
+            <h2>
+                💰 Live Paper Trading
+                <span class="market-badge" id="market-status">-</span>
+            </h2>
+            <div class="grid" style="margin: 0;">
+                <div>
+                    <div class="metric">
+                        <span class="metric-label">Portfolio</span>
+                        <span class="metric-value" id="live-portfolio">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Cash</span>
+                        <span class="metric-value" id="live-cash">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Positions</span>
+                        <span class="metric-value" id="live-positions">-</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="metric">
+                        <span class="metric-label">Cycles Run</span>
+                        <span class="metric-value" id="live-cycles">-</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Total Trades</span>
+                        <span class="metric-value" id="live-trades">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Research Agents -->
+        <h2 style="margin-bottom: 15px; color: #00ff88;">🤖 Research Agents</h2>
+        <div class="grid">
+            <div class="card">
+                <span class="agent-status status-idle" id="agent1-status">IDLE</span>
+                <h2>🧪 Strategy Explorer</h2>
+                <div class="best-sharpe-label">Best Sharpe</div>
+                <div class="best-sharpe" id="agent1-best-sharpe">-</div>
+                <div class="metric">
+                    <span class="metric-label">Experiments</span>
+                    <span class="metric-value" id="agent1-experiments">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Last Run</span>
+                    <span class="metric-value" id="agent1-last-run">Never</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="metric">
+                        <span class="metric-label">Recent Results</span>
+                    </div>
+                    <div class="experiment-list" id="agent1-recent"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <span class="agent-status status-idle" id="agent2-status">IDLE</span>
+                <h2>🛡️ Risk Manager</h2>
+                <div class="best-sharpe-label">Best Sharpe</div>
+                <div class="best-sharpe" id="agent2-best-sharpe">-</div>
+                <div class="metric">
+                    <span class="metric-label">Experiments</span>
+                    <span class="metric-value" id="agent2-experiments">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Last Run</span>
+                    <span class="metric-value" id="agent2-last-run">Never</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="metric">
+                        <span class="metric-label">Recent Results</span>
+                    </div>
+                    <div class="experiment-list" id="agent2-recent"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <span class="agent-status status-idle" id="agent3-status">IDLE</span>
+                <h2>🌍 Universe Explorer</h2>
+                <div class="best-sharpe-label">Best Sharpe</div>
+                <div class="best-sharpe" id="agent3-best-sharpe">-</div>
+                <div class="metric">
+                    <span class="metric-label">Experiments</span>
+                    <span class="metric-value" id="agent3-experiments">0</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Last Run</span>
+                    <span class="metric-value" id="agent3-last-run">Never</span>
+                </div>
+                <div style="margin-top: 10px;">
+                    <div class="metric">
+                        <span class="metric-label">Recent Results</span>
+                    </div>
+                    <div class="experiment-list" id="agent3-recent"></div>
+                </div>
+            </div>
+        </div>
+        
+        <footer style="text-align: center; margin-top: 40px; color: #666; font-size: 12px;">
+            API Endpoint: <code id="api-endpoint">Not configured</code>
+            <br><br>
+            To connect: Set API_URL in the script below to your server address
+        </footer>
+    </div>
+    
+    <script>
+        // CONFIGURE THIS: Change to your server's public IP or domain
+        const API_URL = 'http://54.252.152.15:5000';
+        
+        document.getElementById('api-endpoint').textContent = API_URL;
+        
+        function formatTime(isoString) {
+            if (!isoString || isoString === 'Never') return isoString;
+            const date = new Date(isoString);
+            return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        function formatCurrency(value) {
+            return '$' + value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        function showError(msg) {
+            document.getElementById('error-banner').textContent = msg;
+            document.getElementById('error-banner').style.display = 'block';
+            document.getElementById('connection').textContent = 'Disconnected';
+            document.getElementById('connection').className = 'connection-status disconnected';
+        }
+        
+        function hideError() {
+            document.getElementById('error-banner').style.display = 'none';
+            document.getElementById('connection').textContent = 'Connected';
+            document.getElementById('connection').className = 'connection-status connected';
+        }
+        
+        async function refresh() {
+            try {
+                const response = await fetch(API_URL + '/api/status', {
+                    mode: 'cors',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                
+                const data = await response.json();
+                hideError();
+                
+                document.getElementById('timestamp').textContent = 
+                    'Last updated: ' + new Date(data.timestamp).toLocaleString();
+                
+                // Production Strategy
+                const prod = data.production;
+                if (prod.strategy) {
+                    document.getElementById('prod-strategy').textContent = prod.strategy;
+                    document.getElementById('prod-max-pos').textContent = prod.max_positions;
+                    document.getElementById('prod-entry-rsi').textContent = '< ' + prod.entry_rsi;
+                    document.getElementById('prod-exit-rsi').textContent = '> ' + prod.exit_rsi;
+                    document.getElementById('prod-stop-loss').textContent = (prod.stop_loss * 100) + '%';
+                    document.getElementById('prod-take-profit').textContent = (prod.take_profit * 100) + '%';
+                    document.getElementById('prod-watchlist').innerHTML = 
+                        prod.watchlist.map(s => '<span class="watchlist-item">' + s + '</span>').join('');
+                }
+                
+                // Live Trading
+                const live = data.live_trading;
+                if (live.connected) {
+                    document.getElementById('live-portfolio').textContent = formatCurrency(live.portfolio);
+                    document.getElementById('live-cash').textContent = formatCurrency(live.cash);
+                    document.getElementById('live-positions').textContent = live.positions;
+                    document.getElementById('live-cycles').textContent = live.total_cycles;
+                    document.getElementById('live-trades').textContent = live.total_trades;
+                    
+                    const marketBadge = document.getElementById('market-status');
+                    marketBadge.textContent = live.market_open ? 'OPEN' : 'CLOSED';
+                    marketBadge.className = 'market-badge ' + (live.market_open ? 'market-open' : 'market-closed');
+                } else {
+                    document.getElementById('live-portfolio').textContent = 'Disconnected';
+                }
+                
+                // Agents
+                data.agents.forEach((agent, i) => {
+                    const num = i + 1;
+                    
+                    document.getElementById('agent' + num + '-experiments').textContent = agent.experiments;
+                    document.getElementById('agent' + num + '-best-sharpe').textContent = 
+                        agent.best_sharpe !== null ? agent.best_sharpe.toFixed(3) : '-';
+                    document.getElementById('agent' + num + '-last-run').textContent = 
+                        formatTime(agent.last_run);
+                    
+                    const statusEl = document.getElementById('agent' + num + '-status');
+                    const lastRun = new Date(agent.last_run);
+                    const minutesAgo = (Date.now() - lastRun) / 1000 / 60;
+                    
+                    if (minutesAgo < 10) {
+                        statusEl.textContent = 'ACTIVE';
+                        statusEl.className = 'agent-status status-active';
+                    } else {
+                        statusEl.textContent = 'IDLE';
+                        statusEl.className = 'agent-status status-idle';
+                    }
+                    
+                    const recentEl = document.getElementById('agent' + num + '-recent');
+                    if (agent.recent_results && agent.recent_results.length > 0) {
+                        recentEl.innerHTML = 
+                            '<div class="experiment-item" style="color: #888; font-size: 11px;">' +
+                            '<span>Time</span><span>Sharpe</span><span>Return</span><span>Win%</span>' +
+                            '</div>' +
+                            agent.recent_results.slice(-5).reverse().map(r => 
+                                '<div class="experiment-item">' +
+                                '<span>' + formatTime(r.timestamp) + '</span>' +
+                                '<span class="' + (r.sharpe >= 0 ? 'positive' : 'negative') + '">' + r.sharpe.toFixed(2) + '</span>' +
+                                '<span class="' + (r.returns >= 0 ? 'positive' : 'negative') + '">' + (r.returns >= 0 ? '+' : '') + r.returns + '%</span>' +
+                                '<span>' + r.win_rate + '%</span>' +
+                                '</div>'
+                            ).join('');
+                    } else {
+                        recentEl.innerHTML = '<div style="color: #888; padding: 10px; font-size: 13px;">No experiments yet</div>';
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Cannot connect to API at ' + API_URL + ' - ' + error.message);
+            }
+        }
+        
+        // Initial load
+        refresh();
+        
+        // Auto-refresh every 10 seconds
+        setInterval(refresh, 10000);
+    </script>
+</body>
+</html>
